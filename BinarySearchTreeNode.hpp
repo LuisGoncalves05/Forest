@@ -1,7 +1,7 @@
 #pragma once
 
-template <typename T>
-class BinarySearchTreeNode {
+template <typename T, typename NodeType>
+class BinarySearchTreeNodeBase {
     template <typename Node>
     friend class BinarySearchTree;
 
@@ -10,14 +10,15 @@ class BinarySearchTreeNode {
 
     public:
         T value;
-        BinarySearchTreeNode *left;
-        BinarySearchTreeNode *right;
+        NodeType* left;
+        NodeType* right;
+        NodeType* parent;
 
-        BinarySearchTreeNode(T& val) : value(val), left(nullptr), right(nullptr) {}
+        BinarySearchTreeNodeBase(T& val, NodeType *parent = nullptr) : value(val), left(nullptr), right(nullptr), parent(parent) {}
 };
 
-template <typename T>
-std::ostream &operator<<(std::ostream &os, const BinarySearchTreeNode<T> &node) {
+template <typename T, typename NodeType>
+std::ostream &operator<<(std::ostream &os, const BinarySearchTreeNodeBase<T, NodeType> &node) {
     os << "Node(value: " << node.value;
 
     os << ", left: ";
@@ -37,3 +38,9 @@ std::ostream &operator<<(std::ostream &os, const BinarySearchTreeNode<T> &node) 
     os << ")";
     return os;
 }
+
+template <typename T>
+class BinarySearchTreeNode : public BinarySearchTreeNodeBase<T, BinarySearchTreeNode<T>> {
+    public:
+        BinarySearchTreeNode(T& val, BinarySearchTreeNode<T>* parent = nullptr) : BinarySearchTreeNodeBase<T, BinarySearchTreeNode<T>>(val, parent) {}
+};

@@ -1,20 +1,20 @@
 #include <iostream>
-#include "BinarySearchTree.hpp"
+#include "trees.hpp"
 
 int main() {
-    auto a = BinarySearchTree<BinarySearchTreeNode<int>>();
-    int s = 2, m = 1, n = 3, o = 5;
+    auto a = AVL<int>();
+    int s = 5, m = 4, n = 3, o = 2;
     a.insert(s);
     a.insert(m);
     a.insert(n);
     a.insert(o);
     std::cout << a << std::endl;
-    a.remove(o);
-    std::cout << a << std::endl;
-    a.remove(n);
+    a.remove(s);
     std::cout << a << std::endl;
     a.remove(m);
     std::cout << a << std::endl;
-    a.remove(s);
+    a.remove(n);
+    std::cout << a << std::endl;
+    a.remove(o);
     std::cout << a << std::endl;
 }

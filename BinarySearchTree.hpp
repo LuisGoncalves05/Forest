@@ -11,13 +11,14 @@ class BinarySearchTree {
         Node *root;
 
         BinarySearchTree() : root(nullptr) {}
-        template <typename Iter>
+        template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, valueType>
         BinarySearchTree(Iter begin, Iter end);
 
-        void insert(valueType &value);
-        void insert(Node *node);
-        void remove(valueType &value);
-        void remove(Node *node);
+        virtual void insert(valueType &value, Node *node = nullptr);
+        virtual void remove(valueType &value, Node *node = nullptr);
+
+        valueType& minimum(Node *node = nullptr);
+        valueType& maximum(Node *node = nullptr);
 };
 
 #include "BinarySearchTree.tpp"

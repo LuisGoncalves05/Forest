@@ -2,21 +2,14 @@
 
 #include <iostream>
 
-template <typename Node> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
-BinarySearchTree<Node>::BinarySearchTree(Iter begin, Iter end) {
-    for (auto element = begin; element != end; element++) {
-        insert(*element);
-    }
-}
-
-template <typename Node>
-void BinarySearchTree<Node>::insert(valueType &value, Node *node) {
-    if (root == nullptr) {
-        root = new Node(value);
+template <typename T>
+void AvlTree<T>::insert(T &value, Node *node) {
+    if (this->root == nullptr) {
+        this->root = new Node(value);
         return;
     }
 
-    Node *current = node == nullptr ? root : node;
+    Node *current = node == nullptr ? this->root : node;
     while (true) {
         if (value < current->value) {
             if (current->left) {
@@ -39,10 +32,10 @@ void BinarySearchTree<Node>::insert(valueType &value, Node *node) {
     }
 }
 
-template <typename Node>
-void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
+template <typename T>
+void AvlTree<T>::remove(T &value, Node *node) {
     Node *previous = nullptr;
-    Node *current = node == nullptr ? root : node;
+    Node *current = node == nullptr ? this->root : node;
     while (true) {
         if (value < current->value) {
             if (current->left) {
@@ -62,8 +55,8 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
             }
         } else {
             if (!current->left && !current->right) { // No children
-                if (current == root) {
-                    root = nullptr;
+                if (current == this->root) {
+                    this->root = nullptr;
                 } else if (current == previous->left) {
                     previous->left = nullptr;
                 } else if (current == previous->right) {
@@ -71,9 +64,9 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
                 }
             } else if ((!current->left && current->right) || (current->left && !current->right)) { // 1 child
                 Node *child = current->left ? current->left : current->right;
-                if (current == root) {
-                    root = child;
-                    root->parent = nullptr;
+                if (current == this->root) {
+                    this->root = child;
+                    this->root->parent = nullptr;
                 } else {
                     if (current == previous->left) {
                         previous->left = child;
@@ -83,7 +76,7 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
                     child->parent = previous;
                 }
             } else { // 2 children
-                valueType &m = minimum(current->right);
+                T &m = this->minimum(current->right);
                 remove(m, current);
 
                 Node *min = new Node(m, previous);
@@ -92,8 +85,8 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
                 current->left->parent = min;
                 current->right->parent = min;
 
-                if (current == root) {
-                    root = min;
+                if (current == this->root) {
+                    this->root = min;
                 } else if (current == previous->left) {
                     previous->left = min;
                 } else if (current == previous->right) {
@@ -106,40 +99,86 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
     }
 }
 
-template <typename Node>
-typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum(Node *node) {
-    Node *m = node == nullptr ? root : node;
-    if (m == nullptr) {
-        throw std::logic_error("Can't find minimum of empty tree.");
-    }
+template <typename T>
+void AvlTree<T>::updateHeights(Node *node) {
+    if (node == nullptr) return;
 
-    while (m->left) {
-        m = m->left;
+    int hl = node->left ? node->left->height : 0;
+    int hr = node->right ? node->right->height : 0;
+    int newHeight = std::max(hl, hr) + 1;
+
+    if (node->height != newHeight) {
+        node->height = newHeight;
+        updateHeights(node->parent);
     }
-    return m->value;
 }
 
-template <typename Node>
-typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum(Node *node) {
-    Node *m = node == nullptr ? root : node;
-    if (m == nullptr) {
-        throw std::logic_error("Can't find maximum of empty tree.");
+template <typename T>
+void AvlTree<T>::balance(Node *node) {
+    if (node == nullptr || node->parent == nullptr || node->parent->parent == nullptr) {
+        return;
     }
-    while (m->right) {
-        m = m->right;
+
+    int parentParentBalance = node->parent->parent->getBalance();
+    int parentBalance = node->parent->getBalance();
+
+    if (parentParentBalance == 2) {
+        if (parentBalance == 1) {
+            leftLeft(node);
+        } else { // -1
+            leftRight(node);
+        }
+    } else if (parentParentBalance == -2) {
+        if (parentBalance == 1) {
+            rightLeft(node);
+        } else { // -1
+            rightRight(node);
+        }
     }
-    return m->value;
 }
 
-template <typename Node>
-std::ostream &operator<<(std::ostream &os, const BinarySearchTree<Node> &tree) {
-    os << "Tree(root: ";
-    if (tree.root) {
-        os << *tree.root;
-    } else {
-        os << "nullptr";
-    }
+template <typename T>
+void AvlTree<T>::leftRotate(Node *node) {
+    Node *x = node->parent;
+    Node *p = x->parent;
 
-    os << ")";
-    return os;
+    x->right = node->left;
+    x->parent = node;
+    node->left = x;
+    node->parent = p;
+
+    updateHeights(x);
+}
+
+template <typename T>
+void AvlTree<T>::rightRotate(Node *node) {
+    Node *y = node->parent;
+    Node *p = y->parent;
+
+    y->left = node->right;
+    y->parent = node;
+    node->right = y;
+    node->parent = p;
+
+    updateHeights(y);
+}
+
+template <typename T>
+void AvlTree<T>::leftLeft(Node *node) {
+    rightRotate(node->parent);
+}
+
+template <typename T>
+void AvlTree<T>::leftRight(Node *node) {
+    leftRotate(node);
+}
+
+template <typename T>
+void AvlTree<T>::rightLeft(Node *node) {
+    rightRotate(node);
+}
+
+template <typename T>
+void AvlTree<T>::rightRight(Node *node) {
+    leftRotate(node->parent);
 }
