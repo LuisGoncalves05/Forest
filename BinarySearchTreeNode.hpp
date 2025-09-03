@@ -9,12 +9,12 @@ class BinarySearchTreeNodeBase {
         using valueType = T;
 
     public:
-        T value;
+        const T value;
         NodeType* left;
         NodeType* right;
         NodeType* parent;
 
-        BinarySearchTreeNodeBase(T& val, NodeType *parent = nullptr) : value(val), left(nullptr), right(nullptr), parent(parent) {}
+        BinarySearchTreeNodeBase(const T& val, NodeType *parent = nullptr) : value(val), left(nullptr), right(nullptr), parent(parent) {}
 };
 
 template <typename T, typename NodeType>
@@ -42,5 +42,5 @@ std::ostream &operator<<(std::ostream &os, const BinarySearchTreeNodeBase<T, Nod
 template <typename T>
 class BinarySearchTreeNode : public BinarySearchTreeNodeBase<T, BinarySearchTreeNode<T>> {
     public:
-        BinarySearchTreeNode(T& val, BinarySearchTreeNode<T>* parent = nullptr) : BinarySearchTreeNodeBase<T, BinarySearchTreeNode<T>>(val, parent) {}
+        BinarySearchTreeNode(const T& val, BinarySearchTreeNode<T>* parent = nullptr) : BinarySearchTreeNodeBase<T, BinarySearchTreeNode<T>>(val, parent) {}
 };

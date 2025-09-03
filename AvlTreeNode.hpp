@@ -7,11 +7,11 @@ class AvlTreeNode: public BinarySearchTreeNodeBase<T, AvlTreeNode<T>> {
     public:
         int height;
 
-        AvlTreeNode(T& val, AvlTreeNode<T> *parent = nullptr) : BinarySearchTreeNodeBase<T, AvlTreeNode<T>>(val, parent), height(1) {}
+        AvlTreeNode(const T& val, AvlTreeNode<T> *parent = nullptr) : BinarySearchTreeNodeBase<T, AvlTreeNode<T>>(val, parent), height(1) {}
 
-        int getBalance() {
-            int hl = this->left ? this->left->height : 0;
-            int hr = this->right ? this->right->height : 0;
+        const int getBalance() {
+            const int hl = this->left ? this->left->height : 0;
+            const int hr = this->right ? this->right->height : 0;
             return hl - hr;
         }
 };

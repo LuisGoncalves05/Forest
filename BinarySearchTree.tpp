@@ -3,8 +3,8 @@
 #include <iostream>
 
 template <typename Node> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
-BinarySearchTree<Node>::BinarySearchTree(Iter begin, Iter end) {
-    insertRange(begin, end, [&](typename BinarySearchTree<Node>::valueType &value) {this->insert(value);});
+BinarySearchTree<Node>::BinarySearchTree(Iter begin, Iter end) : BinarySearchTree() {
+    insertRange(begin, end, [&](const typename BinarySearchTree<Node>::valueType &value) {this->insert(value);});
 }
 
 template <typename Node>
@@ -25,15 +25,15 @@ void BinarySearchTree<Node>::deleteSubTree(Node *node) {
     if (node == nullptr) return;
 
     Node *l = node->left, *r = node->right;
-    delete node;
     deleteSubTree(l);
     deleteSubTree(r);
+    delete node;
 }
 
 
 
 template <typename Node>
-void BinarySearchTree<Node>::insert(valueType &value, Node *node) {
+void BinarySearchTree<Node>::insert(const valueType &value, Node *node) {
     if (root == nullptr) {
         root = new Node(value);
         return;
@@ -63,7 +63,7 @@ void BinarySearchTree<Node>::insert(valueType &value, Node *node) {
 }
 
 template <typename Node>
-void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
+void BinarySearchTree<Node>::remove(const valueType &value, Node *node) {
     Node *previous = nullptr;
     Node *current = node == nullptr ? root : node;
     while (true) {
@@ -106,7 +106,7 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
                     child->parent = previous;
                 }
             } else { // 2 children
-                valueType &m = minimum(current->right);
+                const valueType &m = minimum(current->right);
                 remove(m, current);
 
                 Node *min = new Node(m, previous);
@@ -130,29 +130,50 @@ void BinarySearchTree<Node>::remove(valueType &value, Node *node) {
 }
 
 template <typename Node>
-typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum(Node *node) {
-    Node *m = node == nullptr ? root : node;
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum(const Node *node) {
+    const Node *m = node == nullptr ? root : node;
     if (m == nullptr) {
         throw std::logic_error("Can't find minimum of empty tree.");
     }
 
-    while (m->left) {
-        m = m->left;
-    }
-    return m->value;
+    if (node->left) return minimum(node->left);
+    else return m->value;
 }
 
 template <typename Node>
-typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum(Node *node) {
-    Node *m = node == nullptr ? root : node;
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum(const Node *node) {
+    const Node *m = node == nullptr ? root : node;
     if (m == nullptr) {
         throw std::logic_error("Can't find maximum of empty tree.");
     }
-    while (m->right) {
-        m = m->right;
-    }
-    return m->value;
+
+    if (node->right) return maximum(node->right);
+    else return m->value;
 }
+
+template <typename Node>
+bool BinarySearchTree<Node>::find(const valueType &value) {
+    Node *current = root;
+    if (current == nullptr) return false;
+
+    while (value != current->value) {
+        if (value < current->value) {
+            if (current->left) {
+                current = current->left;
+            } else {
+                return false;
+            }
+        } else if (value > current->value) {
+            if (current->right) {
+                current = current->right;
+            } else {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 
 template <typename Node>
 std::ostream &operator<<(std::ostream &os, const BinarySearchTree<Node> &tree) {

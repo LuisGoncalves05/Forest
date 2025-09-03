@@ -8,7 +8,7 @@ AvlTree<T>::AvlTree(Iter begin, Iter end) {
 }
 
 template <typename T>
-void AvlTree<T>::insert(T &value, Node *node) {
+void AvlTree<T>::insert(const T &value, Node *node) {
     if (this->root == nullptr) {
         this->root = new Node(value);
         return;
@@ -40,7 +40,7 @@ void AvlTree<T>::insert(T &value, Node *node) {
 }
 
 template <typename T>
-void AvlTree<T>::remove(T &value, Node *node) {
+void AvlTree<T>::remove(const T &value, Node *node) {
     Node *previous = nullptr;
     Node *current = node == nullptr ? this->root : node;
     while (true) {
@@ -83,7 +83,7 @@ void AvlTree<T>::remove(T &value, Node *node) {
                     child->parent = previous;
                 }
             } else { // 2 children
-                T &m = this->minimum(current->right);
+                const T &m = this->minimum(current->right);
                 remove(m, current);
 
                 Node *min = new Node(m, previous);
@@ -118,8 +118,8 @@ void AvlTree<T>::updateHeights(Node *node) {
 
     if (node->height != newHeight) {
         node->height = newHeight;
-        updateHeights(node->parent);
     }
+    updateHeights(node->parent);
 }
 
 
@@ -165,7 +165,6 @@ void AvlTree<T>::leftRotate(Node *x) {
     y->left = x;
 
     updateHeights(x);
-    updateHeights(y);
 }
 
 template <typename T>
@@ -188,7 +187,6 @@ void AvlTree<T>::rightRotate(Node *y) {
     x->right = y;
 
     updateHeights(y);
-    updateHeights(x);
 }
 
 template <typename T>
