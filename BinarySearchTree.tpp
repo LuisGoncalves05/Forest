@@ -4,10 +4,33 @@
 
 template <typename Node> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
 BinarySearchTree<Node>::BinarySearchTree(Iter begin, Iter end) {
-    for (auto element = begin; element != end; element++) {
-        insert(*element);
-    }
+    insertRange(begin, end, [&](typename BinarySearchTree<Node>::valueType &value) {this->insert(value);});
 }
+
+template <typename Node>
+template <std::input_iterator Iter, typename Inserter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
+void BinarySearchTree<Node>::insertRange(Iter begin, Iter end, Inserter inserter) {
+    for (; begin != end; ++begin)
+        inserter(*begin);
+}
+
+
+template <typename Node>
+BinarySearchTree<Node>::~BinarySearchTree() {
+    deleteSubTree(root);
+}
+
+template <typename Node>
+void BinarySearchTree<Node>::deleteSubTree(Node *node) {
+    if (node == nullptr) return;
+
+    Node *l = node->left, *r = node->right;
+    delete node;
+    deleteSubTree(l);
+    deleteSubTree(r);
+}
+
+
 
 template <typename Node>
 void BinarySearchTree<Node>::insert(valueType &value, Node *node) {
@@ -33,7 +56,7 @@ void BinarySearchTree<Node>::insert(valueType &value, Node *node) {
                 return;
             }
         } else {
-            std::cout << "Already have an equal node: " << node->value << "\n";
+            std::cout << "Already have an equal node: " << value << "\n";
             return;
         }
     }

@@ -1,20 +1,9 @@
 #include <iostream>
+#include <vector>
 #include "trees.hpp"
 
 int main() {
-    auto a = AVL<int>();
-    int s = 5, m = 4, n = 3, o = 2;
-    a.insert(s);
-    a.insert(m);
-    a.insert(n);
-    a.insert(o);
-    std::cout << a << std::endl;
-    a.remove(s);
-    std::cout << a << std::endl;
-    a.remove(m);
-    std::cout << a << std::endl;
-    a.remove(n);
-    std::cout << a << std::endl;
-    a.remove(o);
-    std::cout << a << std::endl;
+    auto v = std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8});
+    auto a = AVL<int>(v.begin(), v.end());
+    std::cout << a << std::endl;   
 }

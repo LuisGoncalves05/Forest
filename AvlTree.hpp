@@ -16,8 +16,11 @@ class AvlTree : public BinarySearchTree<AvlTreeNode<T>> {
         void rightRight(Node *node);
 
     public:
-        virtual void insert(T &value, Node *node = nullptr) override;
-        virtual void remove(T &value, Node *node = nullptr) override;
+        using BinarySearchTree<AvlTreeNode<T>>::BinarySearchTree;
+        template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
+        AvlTree(Iter begin, Iter end);
+        void insert(T &value, Node *node = nullptr) override;
+        void remove(T &value, Node *node = nullptr) override;
 };
 
 #include "AvlTree.tpp"

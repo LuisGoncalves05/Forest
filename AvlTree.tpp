@@ -2,6 +2,11 @@
 
 #include <iostream>
 
+template <typename T> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
+AvlTree<T>::AvlTree(Iter begin, Iter end) {
+    this->insertRange(begin, end, [&](T &value) {this->insert(value);});
+}
+
 template <typename T>
 void AvlTree<T>::insert(T &value, Node *node) {
     if (this->root == nullptr) {
@@ -16,20 +21,22 @@ void AvlTree<T>::insert(T &value, Node *node) {
                 current = current->left;
             } else {
                 current->left = new Node(value, current);
-                return;
+                break;
             }
         } else if (value > current->value) {
             if (current->right) {
                 current = current->right;
             } else {
                 current->right = new Node(value, current);
-                return;
+                break;
             }
         } else {
             std::cout << "Already have an equal node: " << node->value << "\n";
             return;
         }
     }
+    updateHeights(current);
+    balance(current);
 }
 
 template <typename T>
@@ -94,6 +101,8 @@ void AvlTree<T>::remove(T &value, Node *node) {
                 }
             }
             delete current;
+            updateHeights(previous);
+            balance(previous);
             return;
         }
     }
@@ -113,72 +122,93 @@ void AvlTree<T>::updateHeights(Node *node) {
     }
 }
 
+
 template <typename T>
 void AvlTree<T>::balance(Node *node) {
-    if (node == nullptr || node->parent == nullptr || node->parent->parent == nullptr) {
-        return;
-    }
+    if (node == nullptr) return;
 
-    int parentParentBalance = node->parent->parent->getBalance();
-    int parentBalance = node->parent->getBalance();
-
-    if (parentParentBalance == 2) {
-        if (parentBalance == 1) {
-            leftLeft(node);
-        } else { // -1
+    int balance = node->getBalance();
+    if (balance > 1) {
+        if (node->left && node->left->getBalance() < 0) {
             leftRight(node);
+        } else {
+            leftLeft(node);
         }
-    } else if (parentParentBalance == -2) {
-        if (parentBalance == 1) {
+    } else if (balance < -1) {
+        if (node->right && node->right->getBalance() > 0) {
             rightLeft(node);
-        } else { // -1
+        } else { 
             rightRight(node);
         }
     }
+
+    this->balance(node->parent);
 }
 
 template <typename T>
-void AvlTree<T>::leftRotate(Node *node) {
-    Node *x = node->parent;
+void AvlTree<T>::leftRotate(Node *x) {
     Node *p = x->parent;
+    Node *y = x->right;
 
-    x->right = node->left;
-    x->parent = node;
-    node->left = x;
-    node->parent = p;
+    y->parent = p;
+    if (p == nullptr) {
+        this->root = y;
+    } else if (x == p->left) {
+        p->left = y;
+    } else {
+        p->right = y;
+    }
+    x->parent = y;
+
+    x->right = y->left;
+    if (x->right) x->right->parent = x;
+    y->left = x;
 
     updateHeights(x);
-}
-
-template <typename T>
-void AvlTree<T>::rightRotate(Node *node) {
-    Node *y = node->parent;
-    Node *p = y->parent;
-
-    y->left = node->right;
-    y->parent = node;
-    node->right = y;
-    node->parent = p;
-
     updateHeights(y);
 }
 
 template <typename T>
+void AvlTree<T>::rightRotate(Node *y) {
+    Node *p = y->parent;
+    Node *x = y->left;
+
+    x->parent = p;
+    if (p == nullptr) {
+        this->root = x;
+    } else if (y == p->left) {
+        p->left = x;
+    } else {
+        p->right = x;
+    }
+    y->parent = x;
+
+    y->left = x->right;
+    if (y->left) y->left->parent = y;
+    x->right = y;
+
+    updateHeights(y);
+    updateHeights(x);
+}
+
+template <typename T>
 void AvlTree<T>::leftLeft(Node *node) {
-    rightRotate(node->parent);
-}
-
-template <typename T>
-void AvlTree<T>::leftRight(Node *node) {
-    leftRotate(node);
-}
-
-template <typename T>
-void AvlTree<T>::rightLeft(Node *node) {
     rightRotate(node);
 }
 
 template <typename T>
 void AvlTree<T>::rightRight(Node *node) {
-    leftRotate(node->parent);
+    leftRotate(node);
+}
+
+template <typename T>
+void AvlTree<T>::leftRight(Node *node) {
+    leftRotate(node->left);
+    rightRotate(node);
+}
+
+template <typename T>
+void AvlTree<T>::rightLeft(Node *node) {
+    rightRotate(node->right);
+    leftRotate(node);
 }
