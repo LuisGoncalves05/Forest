@@ -1,4 +1,4 @@
-#include "BinarySearchTree.hpp"
+#include "../BinarySearchTree.hpp"
 #include "AvlTreeNode.hpp"
 
 template <typename T>

@@ -14,6 +14,45 @@ void BinarySearchTree<Node>::insertRange(Iter begin, Iter end, Inserter inserter
         inserter(*begin);
 }
 
+template <typename Node>
+void BinarySearchTree<Node>::leftRotate(Node *x) {
+    Node *p = x->parent;
+    Node *y = x->right;
+
+    y->parent = p;
+    if (p == nullptr) {
+        this->root = y;
+    } else if (x == p->left) {
+        p->left = y;
+    } else {
+        p->right = y;
+    }
+    x->parent = y;
+
+    x->right = y->left;
+    if (x->right) x->right->parent = x;
+    y->left = x;
+}
+
+template <typename Node>
+void BinarySearchTree<Node>::rightRotate(Node *y) {
+    Node *p = y->parent;
+    Node *x = y->left;
+
+    x->parent = p;
+    if (p == nullptr) {
+        this->root = x;
+    } else if (y == p->left) {
+        p->left = x;
+    } else {
+        p->right = x;
+    }
+    y->parent = x;
+
+    y->left = x->right;
+    if (y->left) y->left->parent = y;
+    x->right = y;
+}
 
 template <typename Node>
 BinarySearchTree<Node>::~BinarySearchTree() {

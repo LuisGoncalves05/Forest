@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BinarySearchTreeNode.hpp"
+#include "../BinarySearchTreeNode.hpp"
 
 template <typename T>
 class AvlTreeNode: public BinarySearchTreeNodeBase<T, AvlTreeNode<T>> {

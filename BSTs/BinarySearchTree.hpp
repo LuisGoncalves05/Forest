@@ -14,13 +14,15 @@ class BinarySearchTree {
         Node *root;
         template <std::input_iterator Iter, typename Inserter> requires std::same_as<std::iter_value_t<Iter>, valueType>
         void insertRange(Iter begin, Iter end, Inserter inserter);
+
+        void leftRotate(Node *node);
+        void rightRotate(Node *node);
         
     public:
-
         BinarySearchTree() : root(nullptr) {}
         template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, valueType>
         BinarySearchTree(Iter begin, Iter end);
-        virtual ~BinarySearchTree();
+        ~BinarySearchTree();
 
         virtual void insert(const valueType &value, Node *node = nullptr);
         virtual void remove(const valueType &value, Node *node = nullptr);
