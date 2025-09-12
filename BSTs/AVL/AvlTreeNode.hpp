@@ -18,5 +18,21 @@ class AvlTreeNode: public BinarySearchTreeNodeBase<T, AvlTreeNode<T>> {
 
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const AvlTreeNode<T> &node) {
-    return os << "Height: " << node.height << ", " << static_cast<const BinarySearchTreeNodeBase<T, AvlTreeNode<T>>&>(node);
+    os << "AVLNode(height: " << node.height << ", value: " << node.value;
+
+    os << ", left: ";
+    if (node.left) {
+        os << *node.left;
+    } else {
+        os << "nullptr";
+    }
+
+    os << ", right: ";
+    if (node.right) {
+        os << *node.right;
+    } else {
+        os << "nullptr";
+    }
+
+    return os << ")";
 }

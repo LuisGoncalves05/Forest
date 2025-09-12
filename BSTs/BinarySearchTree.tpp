@@ -69,8 +69,6 @@ void BinarySearchTree<Node>::deleteSubTree(Node *node) {
     delete node;
 }
 
-
-
 template <typename Node>
 void BinarySearchTree<Node>::insert(const valueType &value, Node *node) {
     if (root == nullptr) {
@@ -169,25 +167,55 @@ void BinarySearchTree<Node>::remove(const valueType &value, Node *node) {
 }
 
 template <typename Node>
-const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum(const Node *node) {
-    const Node *m = node == nullptr ? root : node;
+Node *BinarySearchTree<Node>::minimumNode(Node* node) {
+    if (!node) return nullptr;
+
+    Node* current = node;
+    while (current->left) {
+        current = current->left;
+    }
+    return current;
+}
+
+template <typename Node>
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum(Node* node) {
+    const Node *m = this->minimumNode(node);
     if (m == nullptr) {
         throw std::logic_error("Can't find minimum of empty tree.");
     }
 
-    if (node->left) return minimum(node->left);
-    else return m->value;
+    return m->value;
 }
 
 template <typename Node>
-const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum(const Node *node) {
-    const Node *m = node == nullptr ? root : node;
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum() {
+    return this->minimum(this->root);
+}
+
+template <typename Node>
+Node *BinarySearchTree<Node>::maximumNode(Node* node) {
+    if (!node) return nullptr;
+
+    Node* current = node;
+    while (current->right) {
+        current = current->right;
+    }
+    return current;
+}
+
+template <typename Node>
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum(Node* node) {
+    const Node *m = this->maximumNode(node);
     if (m == nullptr) {
-        throw std::logic_error("Can't find maximum of empty tree.");
+        throw std::logic_error("Can't find minimum of empty tree.");
     }
 
-    if (node->right) return maximum(node->right);
-    else return m->value;
+    return m->value;
+}
+
+template <typename Node>
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum() {
+    return this->maximum(this->root);
 }
 
 template <typename Node>
