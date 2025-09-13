@@ -4,7 +4,7 @@
 
 template <typename T> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
 AvlTree<T>::AvlTree(Iter begin, Iter end) {
-    this->insertRange(begin, end, [&](T &value) {this->insert(value);});
+    this->insertRange(begin, end, [&](T value) {this->insert(value);});
 }
 
 template <typename T>

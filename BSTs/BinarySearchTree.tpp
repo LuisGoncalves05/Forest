@@ -241,6 +241,21 @@ bool BinarySearchTree<Node>::find(const valueType &value) {
     return true;
 }
 
+template <typename Node>
+int BinarySearchTree<Node>::maxHeight() {
+    return maxHeight(root);
+}
+
+template <typename Node>
+int BinarySearchTree<Node>::maxHeight(Node *node) {
+    if (node == nullptr) return 0;
+
+    int leftHeight  = maxHeight(node->left);
+    int rightHeight = maxHeight(node->right);
+
+    return 1 + std::max(leftHeight, rightHeight);
+}
+
 
 template <typename Node>
 std::ostream &operator<<(std::ostream &os, const BinarySearchTree<Node> &tree) {

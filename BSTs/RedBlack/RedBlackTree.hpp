@@ -31,6 +31,8 @@ class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
         
         void insert(const T &value, Node *node = nullptr) override;
         void remove(const T &value, Node *node = nullptr) override;
+        int maxHeight() override;
+        int maxHeight(Node *node) override;
 
         const T &minimum() override;
         const T &maximum() override;

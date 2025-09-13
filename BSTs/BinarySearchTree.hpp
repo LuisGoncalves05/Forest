@@ -31,6 +31,9 @@ class BinarySearchTree {
 
         virtual void insert(const valueType &value, Node *node = nullptr);
         virtual void remove(const valueType &value, Node *node = nullptr);
+        virtual int maxHeight();
+        virtual int maxHeight(Node *node);
+
 
         virtual const valueType &minimum();
         virtual const valueType &maximum();

@@ -69,7 +69,7 @@ void RedBlackTree<T>::rightRotate(Node *y) {
 
 template <typename T> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
 RedBlackTree<T>::RedBlackTree(Iter begin, Iter end) : RedBlackTree() {
-    this->insertRange(begin, end, [&](T &value) {this->insert(value);});
+    this->insertRange(begin, end, [&](T value) {this->insert(value);});
 }
 
 template <typename T> 
@@ -101,7 +101,6 @@ void RedBlackTree<T>::insert(const T &value, Node *node) {
             return;
         }
     }
-
     fixInsert(inserted);
 }
 
@@ -120,16 +119,17 @@ void RedBlackTree<T>::fixInsert(Node *node) {
         } else { // Black Uncle
             // Case 2: Triangle (Left-Right or Right-Left)
             if (node == node->parent->right && node->parent == node->parent->parent->left) {
-                this->leftRotate(node->parent);
                 node = node->parent;
+                this->leftRotate(node);
             } else if (node == node->parent->left && node->parent == node->parent->parent->right) {
-                this->rightRotate(node->parent);
                 node = node->parent;
+                this->rightRotate(node);
             }
 
             // Case 3: Line (Left-Left or Right-Right)
             node->parent->color = Node::Color::BLACK;
             node->parent->parent->color = Node::Color::RED;
+
             if (node == node->parent->left && node->parent == node->parent->parent->left) {
                 this->rightRotate(node->parent->parent);
             } else {
@@ -387,4 +387,19 @@ bool RedBlackTree<T>::find(const T &value) {
         }
     }
     return true;
+}
+
+template <typename T>
+int RedBlackTree<T>::maxHeight() {
+    return maxHeight(this->root);
+}
+
+template <typename T>
+int RedBlackTree<T>::maxHeight(Node *node) {
+    if (node == Node::nil) return 0;
+
+    int leftHeight  = maxHeight(node->left);
+    int rightHeight = maxHeight(node->right);
+
+    return 1 + std::max(leftHeight, rightHeight);
 }
