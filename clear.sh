@@ -1,2 +1,2 @@
 rm -rf build
-rm avlTests rbtTests playground
+rm bstTests avlTests rbtTests playground

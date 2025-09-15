@@ -1,6 +1,7 @@
 *.out
 .vscode
 build/
+bstTests
 avlTests
 rbtTests
 playground

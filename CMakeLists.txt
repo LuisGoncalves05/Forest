@@ -18,12 +18,18 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
 
-# --- Red-Black Tree tests ---
-add_executable(rbtTests tests/rbtTests.cpp)
-target_link_libraries(rbtTests GTest::gtest_main)
-gtest_discover_tests(rbtTests)
+# --- Unbalanced Binary Search Tree tests ---
+add_executable(bstTests tests/bstTests.cpp)
+target_link_libraries(bstTests GTest::gtest_main)
+gtest_discover_tests(bstTests)
+
 
 # --- AVL Tree tests ---
 add_executable(avlTests tests/avlTests.cpp)
 target_link_libraries(avlTests GTest::gtest_main)
 gtest_discover_tests(avlTests)
+
+# --- Red-Black Tree tests ---
+add_executable(rbtTests tests/rbtTests.cpp)
+target_link_libraries(rbtTests GTest::gtest_main)
+gtest_discover_tests(rbtTests)

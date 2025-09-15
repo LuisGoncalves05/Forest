@@ -1,0 +1,1 @@
+./bstTests && ./avlTests && ./bstTests
