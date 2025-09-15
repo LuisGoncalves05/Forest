@@ -5,7 +5,6 @@ template <typename T>
 class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
     private:
         using Node = RedBlackTreeNode<T>;
-        template <typename U> friend std::ostream &operator<<(std::ostream &os, const RedBlackTree<U> &tree);
 
         void fixInsert(Node *node);
         void fixRemove(Node *node, Node *nodeParent);
@@ -29,6 +28,8 @@ class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
         
         void insert(const T &value) override;
         void remove(const T &value) override;
+
+        template <typename U> friend std::ostream &operator<<(std::ostream &os, const RedBlackTree<U> &tree);
 };
 
 #include "RedBlackTree.tpp"

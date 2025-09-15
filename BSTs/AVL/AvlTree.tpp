@@ -2,6 +2,70 @@
 
 #include <iostream>
 
+template <typename T>
+void AvlTree<T>::updateHeights(Node *node) {
+    if (node == nullptr) return;
+
+    int hl = node->left ? node->left->height : 0;
+    int hr = node->right ? node->right->height : 0;
+    int newHeight = std::max(hl, hr) + 1;
+
+    if (node->height != newHeight) {
+        node->height = newHeight;
+    }
+    updateHeights(node->parent);
+}
+
+template <typename T>
+void AvlTree<T>::balance(Node *node) {
+    if (node == nullptr) return;
+
+    int balance = node->getBalance();
+    if (balance > 1) {
+        if (node->left && node->left->getBalance() < 0) {
+            leftRight(node);
+        } else {
+            leftLeft(node);
+        }
+    } else if (balance < -1) {
+        if (node->right && node->right->getBalance() > 0) {
+            rightLeft(node);
+        } else { 
+            rightRight(node);
+        }
+    }
+
+    this->balance(node->parent);
+}
+
+template <typename T>
+void AvlTree<T>::leftLeft(Node *node) {
+    this->rightRotate(node);
+    updateHeights(node);
+}
+
+template <typename T>
+void AvlTree<T>::rightRight(Node *node) {
+    this->leftRotate(node);
+    updateHeights(node);
+}
+
+template <typename T>
+void AvlTree<T>::leftRight(Node *node) {
+    this->leftRotate(node->left);
+    updateHeights(node->left);
+    this->rightRotate(node);
+    updateHeights(node);
+}
+
+template <typename T>
+void AvlTree<T>::rightLeft(Node *node) {
+    this->rightRotate(node->right);
+    updateHeights(node->right);
+    this->leftRotate(node);
+    updateHeights(node);
+}
+
 template <typename T> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
 AvlTree<T>::AvlTree(Iter begin, Iter end) {
     this->insertRange(begin, end, [&](T value) {this->insert(value);});
@@ -103,75 +167,4 @@ void AvlTree<T>::remove(const T &value) {
             return;
         }
     }
-}
-
-template <typename T>
-void AvlTree<T>::updateHeights(Node *node) {
-    if (node == nullptr) return;
-
-    int hl = node->left ? node->left->height : 0;
-    int hr = node->right ? node->right->height : 0;
-    int newHeight = std::max(hl, hr) + 1;
-
-    if (node->height != newHeight) {
-        node->height = newHeight;
-    }
-    updateHeights(node->parent);
-}
-
-
-template <typename T>
-void AvlTree<T>::balance(Node *node) {
-    if (node == nullptr) return;
-
-    int balance = node->getBalance();
-    if (balance > 1) {
-        if (node->left && node->left->getBalance() < 0) {
-            leftRight(node);
-        } else {
-            leftLeft(node);
-        }
-    } else if (balance < -1) {
-        if (node->right && node->right->getBalance() > 0) {
-            rightLeft(node);
-        } else { 
-            rightRight(node);
-        }
-    }
-
-    this->balance(node->parent);
-}
-
-template <typename T>
-void AvlTree<T>::leftRotate(Node *x) {
-    BinarySearchTree<AvlTreeNode<T>>::leftRotate(x);
-    updateHeights(x);
-}
-
-template <typename T>
-void AvlTree<T>::rightRotate(Node *y) {
-    BinarySearchTree<AvlTreeNode<T>>::rightRotate(y);
-    updateHeights(y);
-}
-
-template <typename T>
-void AvlTree<T>::leftLeft(Node *node) {
-    rightRotate(node);
-}
-
-template <typename T>
-void AvlTree<T>::rightRight(Node *node) {
-    leftRotate(node);
-}
-
-template <typename T>
-void AvlTree<T>::leftRight(Node *node) {
-    leftRotate(node->left);
-    rightRotate(node);
-}
-
-template <typename T>
-void AvlTree<T>::rightLeft(Node *node) {
-    rightRotate(node->right);
-    leftRotate(node);
 }

@@ -2,18 +2,6 @@
 
 #include <iostream>
 
-template <typename Node> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
-BinarySearchTree<Node>::BinarySearchTree(Iter begin, Iter end) : BinarySearchTree() {
-    insertRange(begin, end, [&](const typename BinarySearchTree<Node>::valueType &value) {this->insert(value);});
-}
-
-template <typename Node>
-template <std::input_iterator Iter, typename Inserter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
-void BinarySearchTree<Node>::insertRange(Iter begin, Iter end, Inserter inserter) {
-    for (; begin != end; ++begin)
-        inserter(*begin);
-}
-
 template <typename Node>
 void BinarySearchTree<Node>::leftRotate(Node *x) {
     Node *p = x->parent;
@@ -52,6 +40,32 @@ void BinarySearchTree<Node>::rightRotate(Node *y) {
     y->left = x->right;
     if (y->left) y->left->parent = y;
     x->right = y;
+}
+
+template <typename Node>
+void BinarySearchTree<Node>::transplant(Node *u, Node *v) {
+    if (u->parent == nullptr) {
+        this->root = v;
+    } else if (u->parent->left == u) {
+        u->parent->left = v;
+    } else {
+        u->parent->right = v;
+    }
+    if (v != nullptr) {
+        v->parent = u->parent;
+    }
+}
+
+template <typename Node> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
+BinarySearchTree<Node>::BinarySearchTree(Iter begin, Iter end) : BinarySearchTree() {
+    insertRange(begin, end, [&](const typename BinarySearchTree<Node>::valueType &value) {this->insert(value);});
+}
+
+template <typename Node>
+template <std::input_iterator Iter, typename Inserter> requires std::same_as<std::iter_value_t<Iter>, typename BinarySearchTree<Node>::valueType>
+void BinarySearchTree<Node>::insertRange(Iter begin, Iter end, Inserter inserter) {
+    for (; begin != end; ++begin)
+        inserter(*begin);
 }
 
 template <typename Node>
@@ -163,14 +177,8 @@ void BinarySearchTree<Node>::remove(const valueType &value) {
 }
 
 template <typename Node>
-Node *BinarySearchTree<Node>::minimumNode(Node* node) {
-    if (!node) return nullptr;
-
-    Node* current = node;
-    while (current->left) {
-        current = current->left;
-    }
-    return current;
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum() {
+    return this->minimum(this->root);
 }
 
 template <typename Node>
@@ -184,19 +192,19 @@ const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimu
 }
 
 template <typename Node>
-const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::minimum() {
-    return this->minimum(this->root);
-}
-
-template <typename Node>
-Node *BinarySearchTree<Node>::maximumNode(Node* node) {
+Node *BinarySearchTree<Node>::minimumNode(Node* node) {
     if (!node) return nullptr;
 
     Node* current = node;
-    while (current->right) {
-        current = current->right;
+    while (current->left) {
+        current = current->left;
     }
     return current;
+}
+
+template <typename Node>
+const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum() {
+    return this->maximum(this->root);
 }
 
 template <typename Node>
@@ -210,8 +218,14 @@ const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximu
 }
 
 template <typename Node>
-const typename BinarySearchTree<Node>::valueType &BinarySearchTree<Node>::maximum() {
-    return this->maximum(this->root);
+Node *BinarySearchTree<Node>::maximumNode(Node* node) {
+    if (!node) return nullptr;
+
+    Node* current = node;
+    while (current->right) {
+        current = current->right;
+    }
+    return current;
 }
 
 template <typename Node>
@@ -251,21 +265,6 @@ int BinarySearchTree<Node>::maxHeight(Node *node) {
 
     return 1 + std::max(leftHeight, rightHeight);
 }
-
-template <typename Node>
-void BinarySearchTree<Node>::transplant(Node *u, Node *v) {
-    if (u->parent == nullptr) {
-        this->root = v;
-    } else if (u->parent->left == u) {
-        u->parent->left = v;
-    } else {
-        u->parent->right = v;
-    }
-    if (v != nullptr) {
-        v->parent = u->parent;
-    }
-}
-
 
 template <typename Node>
 std::ostream &operator<<(std::ostream &os, const BinarySearchTree<Node> &tree) {

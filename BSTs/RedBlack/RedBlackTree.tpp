@@ -2,6 +2,66 @@
 
 #include <iostream>
 
+template <typename T>
+RedBlackTreeNode<T> *RedBlackTree<T>::getParent(Node *node) {
+    return node ? node->parent : nullptr;
+}
+
+template <typename T>
+void RedBlackTree<T>::setParent(Node *node, Node *parent) {
+    if (node != nullptr) {
+        node->parent = parent;
+    }
+}
+
+template <typename T>
+RedBlackTreeNode<T> *RedBlackTree<T>::getLeft(Node *node) {
+    return node ? node->left : nullptr;
+}
+
+template <typename T>
+void RedBlackTree<T>::setLeft(Node *node, Node *left) {
+    if (node != nullptr) {
+        node->left = left;
+    }
+}
+
+template <typename T>
+RedBlackTreeNode<T> *RedBlackTree<T>::getRight(Node *node) {
+    return node ? node->right : nullptr;
+}
+
+template <typename T>
+void RedBlackTree<T>::setRight(Node *node, Node *right) {
+    if (node != nullptr) {
+        node->right = right;
+    }
+}
+
+template <typename T>
+RedBlackTreeNode<T>::Color RedBlackTree<T>::getColor(Node *node) {
+    return node ? node->color : Node::Color::BLACK;
+}
+
+template <typename T>
+void RedBlackTree<T>::setColor(Node *node, Node::Color color) {
+    if (node != nullptr) {
+        node->color = color;
+    }
+}
+
+template <typename T>
+const T RedBlackTree<T>::getValue(Node *node) {
+    return node ? node->value : T{};
+}
+
+template <typename T>
+void RedBlackTree<T>::setValue(Node *node, const T &value) {
+    if (node != nullptr) {
+        node->value = value;
+    }
+}
+
 template <typename T> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
 RedBlackTree<T>::RedBlackTree(Iter begin, Iter end) : RedBlackTree() {
     this->insertRange(begin, end, [&](T value) {this->insert(value);});
@@ -226,66 +286,6 @@ void RedBlackTree<T>::fixRemove(Node *x, Node *xParent) {
     }
 
     setColor(x, Node::Color::BLACK);
-}
-
-template <typename T>
-RedBlackTreeNode<T> *RedBlackTree<T>::getParent(Node *node) {
-    return node ? node->parent : nullptr;
-}
-
-template <typename T>
-void RedBlackTree<T>::setParent(Node *node, Node *parent) {
-    if (node != nullptr) {
-        node->parent = parent;
-    }
-}
-
-template <typename T>
-RedBlackTreeNode<T> *RedBlackTree<T>::getLeft(Node *node) {
-    return node ? node->left : nullptr;
-}
-
-template <typename T>
-void RedBlackTree<T>::setLeft(Node *node, Node *left) {
-    if (node != nullptr) {
-        node->left = left;
-    }
-}
-
-template <typename T>
-RedBlackTreeNode<T> *RedBlackTree<T>::getRight(Node *node) {
-    return node ? node->right : nullptr;
-}
-
-template <typename T>
-void RedBlackTree<T>::setRight(Node *node, Node *right) {
-    if (node != nullptr) {
-        node->right = right;
-    }
-}
-
-template <typename T>
-RedBlackTreeNode<T>::Color RedBlackTree<T>::getColor(Node *node) {
-    return node ? node->color : Node::Color::BLACK;
-}
-
-template <typename T>
-void RedBlackTree<T>::setColor(Node *node, Node::Color color) {
-    if (node != nullptr) {
-        node->color = color;
-    }
-}
-
-template <typename T>
-const T RedBlackTree<T>::getValue(Node *node) {
-    return node ? node->value : T{};
-}
-
-template <typename T>
-void RedBlackTree<T>::setValue(Node *node, const T &value) {
-    if (node != nullptr) {
-        node->value = value;
-    }
 }
 
 template <typename T>

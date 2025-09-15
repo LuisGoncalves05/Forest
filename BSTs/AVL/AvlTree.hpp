@@ -9,9 +9,6 @@ class AvlTree : public BinarySearchTree<AvlTreeNode<T>> {
         void updateHeights(Node *node);
         void balance(Node *node);
 
-        void leftRotate(Node *node);
-        void rightRotate(Node *node);
-
         void leftLeft(Node *node);
         void leftRight(Node *node);
         void rightLeft(Node *node);
