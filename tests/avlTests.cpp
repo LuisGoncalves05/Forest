@@ -15,7 +15,7 @@ TEST(AVLRandomInsertTest, BasicAssertions) {
     auto mySet = AVL<int>(stlSet.begin(), stlSet.end());
     EXPECT_LE(mySet.maxHeight(), std::floor(1.44*std::log2(stlSet.size()+2)-0.328));
 
-        for (size_t i = 0; i < stlSet.size(); i++) {
+    for (size_t i = 0; i < stlSet.size(); i++) {
         int elements[2] = {*stlSet.begin(), *stlSet.rbegin()};
         int stlMin = elements[0];
         int stlMax = elements[1];

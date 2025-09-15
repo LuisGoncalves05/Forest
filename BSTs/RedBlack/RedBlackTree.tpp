@@ -2,71 +2,6 @@
 
 #include <iostream>
 
-template <typename T>
-RedBlackTree<T>::RedBlackTree() {
-    this->root = Node::nil;
-}
-
-template <typename T>
-void RedBlackTree<T>::deleteSubTree(Node *node) {
-    if (node == Node::nil || node == nullptr) return;
-
-    Node *l = node->left, *r = node->right;
-    deleteSubTree(l);
-    deleteSubTree(r);
-    delete node;
-}
-
-template <typename T>
-RedBlackTree<T>::~RedBlackTree() {
-    this->deleteSubTree(this->root);
-    this->root = nullptr; // Bst delete will run after so root needs to be nullptr
-}
-
-template <typename T>
-void RedBlackTree<T>::leftRotate(Node *x) {
-    Node *p = x->parent;
-    Node *y = x->right;
-
-    y->parent = p;
-    if (p == Node::nil) {
-        this->root = y;
-    } else if (x == p->left) {
-        p->left = y;
-    } else {
-        p->right = y;
-    }
-    x->parent = y;
-
-    x->right = y->left;
-    if (x->right != Node::nil) {
-        x->right->parent = x;
-    }
-    y->left = x;
-}
-
-template <typename T>
-void RedBlackTree<T>::rightRotate(Node *y) {
-    Node *p = y->parent;
-    Node *x = y->left;
-
-    x->parent = p;
-    if (p == Node::nil) {
-        this->root = x;
-    } else if (y == p->left) {
-        p->left = x;
-    } else {
-        p->right = x;
-    }
-    y->parent = x;
-
-    y->left = x->right;
-    if (y->left != Node::nil) {
-        y->left->parent = y;
-    }
-    x->right = y;
-}
-
 template <typename T> template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
 RedBlackTree<T>::RedBlackTree(Iter begin, Iter end) : RedBlackTree() {
     this->insertRange(begin, end, [&](T value) {this->insert(value);});
@@ -74,10 +9,9 @@ RedBlackTree<T>::RedBlackTree(Iter begin, Iter end) : RedBlackTree() {
 
 template <typename T> 
 void RedBlackTree<T>::insert(const T &value, Node *node) {
-    // Inserts in root if it is nil, even if node is not nullptr, which is not possible if all is correct but who knows
     Node *current = node == nullptr ? this->root : node;
-    if (this->root == Node::nil) {
-        this->root = new Node(value, Node::nil, Node::nil, Node::nil, Node::Color::BLACK);
+    if (current == nullptr) {
+        this->root = new Node(value, nullptr, nullptr, nullptr, Node::Color::BLACK);
         return;
     }
 
@@ -85,16 +19,16 @@ void RedBlackTree<T>::insert(const T &value, Node *node) {
 
     while (inserted == nullptr) {
         if (value < current->value) {
-            if (current->left != Node::nil) {
+            if (current->left != nullptr) {
                 current = current->left;
             } else {
-                inserted = current->left = new Node(value, current, Node::nil, Node::nil);
+                inserted = current->left = new Node(value, current, nullptr, nullptr);
             }
         } else if (value > current->value) {
-            if (current->right != Node::nil) {
+            if (current->right != nullptr) {
                 current = current->right;
             } else {
-                inserted = current->right = new Node(value, current, Node::nil, Node::nil);
+                inserted = current->right = new Node(value, current, nullptr, nullptr);
             }
         } else {
             std::cout << "Already have an equal node: " << value << "\n";
@@ -106,62 +40,69 @@ void RedBlackTree<T>::insert(const T &value, Node *node) {
 
 template <typename T>
 void RedBlackTree<T>::fixInsert(Node *node) {
-    while (node->parent->color == Node::Color::RED) {
-        Node *uncle = (node->parent == node->parent->parent->left)
-                      ? node->parent->parent->right
-                      : node->parent->parent->left;
+    while (getColor(getParent(node)) == Node::Color::RED) {
+        Node *parent = getParent(node);
+        Node *grandparent = getParent(parent);
 
-        if (uncle->color == Node::Color::RED) { // Case 1: Red Uncle
-            node->parent->color = Node::Color::BLACK;
-            uncle->color = Node::Color::BLACK;
-            node->parent->parent->color = Node::Color::RED;
-            node = node->parent->parent; // Move up the tree
-        } else { // Black Uncle
+        Node *uncle = (parent == getLeft(grandparent))
+                      ? getRight(grandparent)
+                      : getLeft(grandparent);
+
+        if (getColor(uncle) == Node::Color::RED) {
+            // Case 1: Red Uncle
+            setColor(parent, Node::Color::BLACK);
+            setColor(uncle, Node::Color::BLACK);
+            setColor(grandparent, Node::Color::RED);
+            node = grandparent; // Move up the tree
+        } else {
             // Case 2: Triangle (Left-Right or Right-Left)
-            if (node == node->parent->right && node->parent == node->parent->parent->left) {
-                node = node->parent;
+            if (node == getRight(parent) && parent == getLeft(grandparent)) {
+                node = parent;
                 this->leftRotate(node);
-            } else if (node == node->parent->left && node->parent == node->parent->parent->right) {
-                node = node->parent;
+            } else if (node == getLeft(parent) && parent == getRight(grandparent)) {
+                node = parent;
                 this->rightRotate(node);
             }
 
             // Case 3: Line (Left-Left or Right-Right)
-            node->parent->color = Node::Color::BLACK;
-            node->parent->parent->color = Node::Color::RED;
+            parent = getParent(node);
+            grandparent = getParent(parent);
 
-            if (node == node->parent->left && node->parent == node->parent->parent->left) {
-                this->rightRotate(node->parent->parent);
+            setColor(parent, Node::Color::BLACK);
+            setColor(grandparent, Node::Color::RED);
+
+            if (node == getLeft(parent) && parent == getLeft(grandparent)) {
+                this->rightRotate(grandparent);
             } else {
-                this->leftRotate(node->parent->parent);
+                this->leftRotate(grandparent);
             }
             break;
         }
     }
 
-    this->root->color = Node::Color::BLACK; // Ensure root is always black
+    setColor(this->root, Node::Color::BLACK); // Ensure root is always black
 }
-
 
 template <typename T> 
 void RedBlackTree<T>::remove(const T &value, Node *node) {
-    if (this->root == nullptr || this->root == Node::nil) {
+    if (this->root == nullptr) {
         std::cout << "Node not found: " << value << "\n";
         return;
     }
-    Node *z = node == nullptr ? this->root : node;
+
+    Node *z = (node == nullptr) ? this->root : node;
 
     while (true) {
-        if (value < z->value) {
-            if (z->left != Node::nil) {
-                z = z->left;
+        if (value < getValue(z)) {
+            if (getLeft(z) != nullptr) {
+                z = getLeft(z);
             } else {
                 std::cout << "Node not found: " << value << "\n";
                 break;
             }
-        } else if (value > z->value) {
-            if (z->right != Node::nil) {
-                z = z->right;
+        } else if (value > getValue(z)) {
+            if (getRight(z) != nullptr) {
+                z = getRight(z);
             } else {
                 std::cout << "Node not found: " << value << "\n";
                 break;
@@ -170,139 +111,199 @@ void RedBlackTree<T>::remove(const T &value, Node *node) {
             Node *y = z;
             Node *x = nullptr;
             Node *xParent = nullptr;
-            typename Node::Color yOriginalColor = y->color;
+            typename Node::Color yOriginalColor = getColor(y);
 
-            if (z->left == Node::nil) {
-                x = z->right;
-                xParent = z->parent;
-                transplant(z, z->right);
-            } else if (z->right == Node::nil) {
-                x = z->left;
-                xParent = z->parent;
-                transplant(z, z->left);
+            if (getLeft(z) == nullptr) {
+                x = getRight(z);
+                xParent = getParent(z);
+                transplant(z, getRight(z));
+            } else if (getRight(z) == nullptr) {
+                x = getLeft(z);
+                xParent = getParent(z);
+                transplant(z, getLeft(z));
             } else {
-                y = this->maximumNode(z->left);
-                yOriginalColor = y->color;
-                x = y->left;
-                
-                if (y->parent == z) {
+                y = this->maximumNode(getLeft(z));
+                yOriginalColor = getColor(y);
+                x = getLeft(y);
+
+                if (getParent(y) == z) {
                     xParent = y;
-                    if (x != Node::nil) {
-                        x->parent = y;
+                    if (x != nullptr) {
+                        setParent(x, y);
                     }
                 } else {
-                    xParent = y->parent;
-                    transplant(y, y->left);
-                    y->left = z->left;
-                    if (y->left != Node::nil) {
-                        y->left->parent = y;
+                    xParent = getParent(y);
+                    transplant(y, getLeft(y));
+                    setLeft(y, getLeft(z));
+                    if (getLeft(y) != nullptr) {
+                        setParent(getLeft(y), y);
                     }
                 }
 
                 transplant(z, y);
-                y->right = z->right;
-                if (y->right != Node::nil) {
-                    y->right->parent = y;
+                setRight(y, getRight(z));
+                if (getRight(y) != nullptr) {
+                    setParent(getRight(y), y);
                 }
-                y->color = z->color;
+                setColor(y, getColor(z));
             }
+
             delete z;
 
-            // 4. If the removed node was black, fix double-black
+            // If the removed node was black, fix double-black
             if (yOriginalColor == Node::Color::BLACK) {
                 fixRemove(x, xParent);
             }
-
             break;
         }
     }
 }
 
-template <typename T>
+template <typename T> //val null
 void RedBlackTree<T>::transplant(Node *u, Node *v) {
-    if (u->parent == Node::nil) {
+    if (getParent(u) == nullptr) {
         this->root = v;
-    } else if (u == u->parent->left) {
-        u->parent->left = v;
+    } else if (u == getLeft(getParent(u))) {
+        setLeft(getParent(u), v);
     } else {
-        u->parent->right = v;
+        setRight(getParent(u), v);
     }
-    if (v != Node::nil) {
-        v->parent = u->parent;
+    if (v != nullptr) {
+        setParent(v, getParent(u));
     }
 }
 
 template <typename T>
 void RedBlackTree<T>::fixRemove(Node *x, Node *xParent) {
-    while (x != this->root && x->color == Node::Color::BLACK) {
-        if (x == xParent->left) {
-            Node *w = xParent->right;
+    while (x != this->root && getColor(x) == Node::Color::BLACK) {
+        if (x == getLeft(xParent)) {
+            Node *w = getRight(xParent);
 
-            if (w->color == Node::Color::RED) { // Case 1
-                w->color = Node::Color::BLACK;
-                xParent->color = Node::Color::RED;
+            if (getColor(w) == Node::Color::RED) { // Case 1
+                setColor(w, Node::Color::BLACK);
+                setColor(xParent, Node::Color::RED);
                 this->leftRotate(xParent);
-                w = xParent->right;
+                w = getRight(xParent);
             }
 
-            if (w->left->color == Node::Color::BLACK &&
-                w->right->color == Node::Color::BLACK) { // Case 2
-                w->color = Node::Color::RED;
+            if (getColor(getLeft(w)) == Node::Color::BLACK &&
+                getColor(getRight(w)) == Node::Color::BLACK) { // Case 2
+                setColor(w, Node::Color::RED);
                 x = xParent;   // bubble up
-                xParent = x->parent;
+                xParent = getParent(x);
             } else {
-                if (w->right->color == Node::Color::BLACK) { // Case 3
-                    w->left->color = Node::Color::BLACK;
-                    w->color = Node::Color::RED;
+                if (getColor(getRight(w)) == Node::Color::BLACK) { // Case 3
+                    setColor(getLeft(w), Node::Color::BLACK);
+                    setColor(w, Node::Color::RED);
                     this->rightRotate(w);
-                    w = xParent->right;
+                    w = getRight(xParent);
                 }
                 // Case 4
-                w->color = xParent->color;
-                xParent->color = Node::Color::BLACK;
-                w->right->color = Node::Color::BLACK;
+                setColor(w, getColor(xParent));
+                setColor(xParent, Node::Color::BLACK);
+                setColor(getRight(w), Node::Color::BLACK);
                 this->leftRotate(xParent);
                 x = this->root; // terminate
             }
         } else {
-            Node *w = xParent->left;
+            Node *w = getLeft(xParent);
 
-            if (w->color == Node::Color::RED) { // Case 1
-                w->color = Node::Color::BLACK;
-                xParent->color = Node::Color::RED;
+            if (getColor(w) == Node::Color::RED) { // Case 1
+                setColor(w, Node::Color::BLACK);
+                setColor(xParent, Node::Color::RED);
                 this->rightRotate(xParent);
-                w = xParent->left;
+                w = getLeft(xParent);
             }
 
-            if (w->right->color == Node::Color::BLACK &&
-                w->left->color == Node::Color::BLACK) { // Case 2
-                w->color = Node::Color::RED;
+            if (getColor(getRight(w)) == Node::Color::BLACK &&
+                getColor(getLeft(w)) == Node::Color::BLACK) { // Case 2
+                setColor(w, Node::Color::RED);
                 x = xParent;   // bubble up
-                xParent = x->parent;
+                xParent = getParent(x);
             } else {
-                if (w->left->color == Node::Color::BLACK) { // Case 3
-                    w->right->color = Node::Color::BLACK;
-                    w->color = Node::Color::RED;
+                if (getColor(getLeft(w)) == Node::Color::BLACK) { // Case 3
+                    setColor(getRight(w), Node::Color::BLACK);
+                    setColor(w, Node::Color::RED);
                     this->leftRotate(w);
-                    w = xParent->left;
+                    w = getLeft(xParent);
                 }
                 // Case 4
-                w->color = xParent->color;
-                xParent->color = Node::Color::BLACK;
-                w->left->color = Node::Color::BLACK;
+                setColor(w, getColor(xParent));
+                setColor(xParent, Node::Color::BLACK);
+                setColor(getLeft(w), Node::Color::BLACK);
                 this->rightRotate(xParent);
                 x = this->root; // terminate
             }
         }
     }
 
-    x->color = Node::Color::BLACK;
+    setColor(x, Node::Color::BLACK);
+}
+
+template <typename T>
+RedBlackTreeNode<T> *RedBlackTree<T>::getParent(Node *node) {
+    return node ? node->parent : nullptr;
+}
+
+template <typename T>
+void RedBlackTree<T>::setParent(Node *node, Node *parent) {
+    if (node != nullptr) {
+        node->parent = parent;
+    }
+}
+
+template <typename T>
+RedBlackTreeNode<T> *RedBlackTree<T>::getLeft(Node *node) {
+    return node ? node->left : nullptr;
+}
+
+template <typename T>
+void RedBlackTree<T>::setLeft(Node *node, Node *left) {
+    if (node != nullptr) {
+        node->left = left;
+    }
+}
+
+template <typename T>
+RedBlackTreeNode<T> *RedBlackTree<T>::getRight(Node *node) {
+    return node ? node->right : nullptr;
+}
+
+template <typename T>
+void RedBlackTree<T>::setRight(Node *node, Node *right) {
+    if (node != nullptr) {
+        node->right = right;
+    }
+}
+
+template <typename T>
+RedBlackTreeNode<T>::Color RedBlackTree<T>::getColor(Node *node) {
+    return node ? node->color : Node::Color::BLACK;
+}
+
+template <typename T>
+void RedBlackTree<T>::setColor(Node *node, Node::Color color) {
+    if (node != nullptr) {
+        node->color = color;
+    }
+}
+
+template <typename T>
+T RedBlackTree<T>::getValue(Node *node) {
+    return node ? node->value : T{};
+}
+
+template <typename T>
+void RedBlackTree<T>::setValue(Node *node, const T &value) {
+    if (node != nullptr) {
+        node->value = value;
+    }
 }
 
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const RedBlackTree<T> &tree) {
     os << "Tree(root: ";
-    if (tree.root == RedBlackTreeNode<T>::nil) {
+    if (tree.root == nullptr) {
         os << "nil";
     } else {
         os << *tree.root;
@@ -310,96 +311,4 @@ std::ostream &operator<<(std::ostream &os, const RedBlackTree<T> &tree) {
 
     os << ")";
     return os;
-}
-
-
-template <typename T>
-RedBlackTreeNode<T> *RedBlackTree<T>::minimumNode(Node* node) {
-    if (node == Node::nil) return Node::nil;
-
-    Node* current = node;
-    while (current->left != Node::nil) {
-        current = current->left;
-    }
-    return current;
-}
-
-
-template <typename T>
-const T &RedBlackTree<T>::minimum(Node* node) {
-    const Node *m = this->minimumNode(node);
-    if (m == Node::nil) {
-        throw std::logic_error("Can't find minimum of empty tree.");
-    }
-
-    return m->value;
-}
-
-template <typename T>
-const T &RedBlackTree<T>::minimum() {
-    return this->minimum(this->root);
-}
-
-template <typename T>
-RedBlackTreeNode<T> *RedBlackTree<T>::maximumNode(Node* node) {
-    if (node == Node::nil) return Node::nil;
-
-    Node* current = node;
-    while (current->right != Node::nil) {
-        current = current->right;
-    }
-    return current;
-}
-
-template <typename T>
-const T &RedBlackTree<T>::maximum(Node* node) {
-    const Node *m = this->maximumNode(node);
-    if (m == Node::nil) {
-        throw std::logic_error("Can't find minimum of empty tree.");
-    }
-
-    return m->value;
-}
-
-template <typename T>
-const T &RedBlackTree<T>::maximum() {
-    return this->maximum(this->root);
-}
-
-template <typename T>
-bool RedBlackTree<T>::find(const T &value) {
-    Node *current = this->root;
-    if (current == Node::nil) return false;
-
-    while (value != current->value) {
-        if (value < current->value) {
-            if (current->left != Node::nil) {
-                current = current->left;
-            } else {
-                return false;
-            }
-        } else if (value > current->value) {
-            if (current->right != Node::nil) {
-                current = current->right;
-            } else {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-template <typename T>
-int RedBlackTree<T>::maxHeight() {
-    return maxHeight(this->root);
-}
-
-template <typename T>
-int RedBlackTree<T>::maxHeight(Node *node) {
-    if (node == Node::nil) return 0;
-
-    int leftHeight  = maxHeight(node->left);
-    int rightHeight = maxHeight(node->right);
-
-    return 1 + std::max(leftHeight, rightHeight);
 }

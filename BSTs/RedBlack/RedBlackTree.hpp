@@ -12,32 +12,28 @@ class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
 
         void transplant(Node *u, Node *v);
 
-        void deleteSubTree(Node *node) override;
+        Node *getParent(Node *node);
+        void setParent(Node *node, Node *parent);
 
-        void leftRotate(Node *node) override;
-        void rightRotate(Node *node) override;
+        Node *getLeft(Node *node);
+        void setLeft(Node *node, Node *left);
 
-        Node *minimumNode(Node* node) override;
-        Node *maximumNode(Node* node) override;
+        Node *getRight(Node *node);
+        void setRight(Node *node, Node *right);
 
-        const T &minimum(Node* node) override;
-        const T &maximum(Node* node) override;
-        
+        Node::Color getColor(Node *node);
+        void setColor(Node *node, Node::Color color);
+
+        T getValue(Node *node);
+        void setValue(Node *node, const T &value);
+
     public:
-        RedBlackTree();
+        using BinarySearchTree<RedBlackTreeNode<T>>::BinarySearchTree;
         template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
         RedBlackTree(Iter begin, Iter end);
-        ~RedBlackTree();
         
         void insert(const T &value, Node *node = nullptr) override;
         void remove(const T &value, Node *node = nullptr) override;
-        int maxHeight() override;
-        int maxHeight(Node *node) override;
-
-        const T &minimum() override;
-        const T &maximum() override;
-
-        bool find(const T &value) override;
 };
 
 #include "RedBlackTree.tpp"
