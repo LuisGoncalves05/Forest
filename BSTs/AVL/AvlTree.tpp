@@ -41,16 +41,16 @@ void AvlTree<T>::insert(const T &value) {
 }
 
 template <typename T>
-void AvlTree<T>::remove(const T &value, Node *node) {
+void AvlTree<T>::remove(const T &value) {
     Node *previous = nullptr;
-    Node *current = node == nullptr ? this->root : node;
+    Node *current = this->root;
     while (true) {
         if (value < current->value) {
             if (current->left) {
                 previous = current;
                 current = current->left;
             } else {
-                std::cout << "Node not found: " << node->value << "\n";
+                std::cout << "Node not found: " << value << "\n";
                 return;
             }
         } else if (value > current->value) {
@@ -58,7 +58,7 @@ void AvlTree<T>::remove(const T &value, Node *node) {
                 previous = current;
                 current = current->right;
             } else {
-                std::cout << "Node not found: " << node->value << "\n";
+                std::cout << "Node not found: " << value << "\n";
                 return;
             }
         } else {

@@ -86,13 +86,13 @@ void RedBlackTree<T>::fixInsert(Node *node) {
 }
 
 template <typename T> 
-void RedBlackTree<T>::remove(const T &value, Node *node) {
+void RedBlackTree<T>::remove(const T &value) {
     if (this->root == nullptr) {
         std::cout << "Node not found: " << value << "\n";
         return;
     }
 
-    Node *z = (node == nullptr) ? this->root : node;
+    Node *z = this->root;
 
     while (true) {
         if (value < getValue(z)) {

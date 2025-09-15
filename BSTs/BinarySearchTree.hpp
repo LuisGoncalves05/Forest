@@ -32,7 +32,7 @@ class BinarySearchTree {
         ~BinarySearchTree();
 
         virtual void insert(const valueType &value);
-        virtual void remove(const valueType &value, Node *node = nullptr);
+        virtual void remove(const valueType &value);
         int maxHeight();
         int maxHeight(Node *node);
 

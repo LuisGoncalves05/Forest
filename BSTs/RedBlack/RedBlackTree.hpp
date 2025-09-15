@@ -28,7 +28,7 @@ class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
         RedBlackTree(Iter begin, Iter end);
         
         void insert(const T &value) override;
-        void remove(const T &value, Node *node = nullptr) override;
+        void remove(const T &value) override;
 };
 
 #include "RedBlackTree.tpp"

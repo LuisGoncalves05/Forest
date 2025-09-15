@@ -100,16 +100,16 @@ void BinarySearchTree<Node>::insert(const valueType &value) {
 }
 
 template <typename Node>
-void BinarySearchTree<Node>::remove(const valueType &value, Node *node) {
+void BinarySearchTree<Node>::remove(const valueType &value) {
     Node *previous = nullptr;
-    Node *current = node == nullptr ? root : node;
+    Node *current = root;
     while (true) {
         if (value < current->value) {
             if (current->left) {
                 previous = current;
                 current = current->left;
             } else {
-                std::cout << "Node not found: " << node->value << "\n";
+                std::cout << "Node not found: " << value << "\n";
                 return;
             }
         } else if (value > current->value) {
@@ -117,7 +117,7 @@ void BinarySearchTree<Node>::remove(const valueType &value, Node *node) {
                 previous = current;
                 current = current->right;
             } else {
-                std::cout << "Node not found: " << node->value << "\n";
+                std::cout << "Node not found: " << value << "\n";
                 return;
             }
         } else {
