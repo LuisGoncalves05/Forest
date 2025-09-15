@@ -70,13 +70,13 @@ void BinarySearchTree<Node>::deleteSubTree(Node *node) {
 }
 
 template <typename Node>
-void BinarySearchTree<Node>::insert(const valueType &value, Node *node) {
+void BinarySearchTree<Node>::insert(const valueType &value) {
     if (root == nullptr) {
         root = new Node(value);
         return;
     }
 
-    Node *current = node == nullptr ? root : node;
+    Node *current = root;
     while (true) {
         if (value < current->value) {
             if (current->left) {
@@ -143,22 +143,18 @@ void BinarySearchTree<Node>::remove(const valueType &value, Node *node) {
                     child->parent = previous;
                 }
             } else { // 2 children
-                const valueType &m = minimum(current->right);
-                remove(m, current);
+                Node* m = this->maximumNode(current->left);
 
-                Node *min = new Node(m, previous);
-                min->left = current->left;
-                min->right = current->right;
-                current->left->parent = min;
-                current->right->parent = min;
-
-                if (current == root) {
-                    root = min;
-                } else if (current == previous->left) {
-                    previous->left = min;
-                } else if (current == previous->right) {
-                    previous->right = min;
+                if (m->parent != current) {
+                    this->transplant(m, m->left);
+                    m->left = current->left;
+                    if (m->left) m->left->parent = m;
                 }
+
+                this->transplant(current, m);
+
+                m->right = current->right;
+                if (m->right) m->right->parent = m;
             }
             delete current;
             return;
@@ -254,6 +250,20 @@ int BinarySearchTree<Node>::maxHeight(Node *node) {
     int rightHeight = maxHeight(node->right);
 
     return 1 + std::max(leftHeight, rightHeight);
+}
+
+template <typename Node>
+void BinarySearchTree<Node>::transplant(Node *u, Node *v) {
+    if (u->parent == nullptr) {
+        this->root = v;
+    } else if (u->parent->left == u) {
+        u->parent->left = v;
+    } else {
+        u->parent->right = v;
+    }
+    if (v != nullptr) {
+        v->parent = u->parent;
+    }
 }
 
 

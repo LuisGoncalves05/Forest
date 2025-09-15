@@ -10,21 +10,16 @@ class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
         void fixInsert(Node *node);
         void fixRemove(Node *node, Node *nodeParent);
 
-        void transplant(Node *u, Node *v);
-
+        /* for handling nullptr */
         Node *getParent(Node *node);
         void setParent(Node *node, Node *parent);
-
         Node *getLeft(Node *node);
         void setLeft(Node *node, Node *left);
-
         Node *getRight(Node *node);
         void setRight(Node *node, Node *right);
-
         Node::Color getColor(Node *node);
         void setColor(Node *node, Node::Color color);
-
-        T getValue(Node *node);
+        const T getValue(Node *node);
         void setValue(Node *node, const T &value);
 
     public:
@@ -32,7 +27,7 @@ class RedBlackTree : public BinarySearchTree<RedBlackTreeNode<T>> {
         template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
         RedBlackTree(Iter begin, Iter end);
         
-        void insert(const T &value, Node *node = nullptr) override;
+        void insert(const T &value) override;
         void remove(const T &value, Node *node = nullptr) override;
 };
 

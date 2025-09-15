@@ -17,6 +17,8 @@ class BinarySearchTree {
         void leftRotate(Node *node);
         void rightRotate(Node *node);
 
+        void transplant(Node *u, Node *v);
+
         Node *minimumNode(Node* node);
         Node *maximumNode(Node* node);
 
@@ -27,17 +29,16 @@ class BinarySearchTree {
         BinarySearchTree() : root(nullptr) {}
         template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, valueType>
         BinarySearchTree(Iter begin, Iter end);
-        virtual ~BinarySearchTree();
+        ~BinarySearchTree();
 
-        virtual void insert(const valueType &value, Node *node = nullptr);
+        virtual void insert(const valueType &value);
         virtual void remove(const valueType &value, Node *node = nullptr);
-        virtual int maxHeight();
-        virtual int maxHeight(Node *node);
+        int maxHeight();
+        int maxHeight(Node *node);
 
-
-        virtual const valueType &minimum();
-        virtual const valueType &maximum();
-        virtual bool find(const valueType &value);
+        const valueType &minimum();
+        const valueType &maximum();
+        bool find(const valueType &value);
 };
 
 #include "BinarySearchTree.tpp"

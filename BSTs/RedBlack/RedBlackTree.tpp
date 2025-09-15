@@ -8,27 +8,29 @@ RedBlackTree<T>::RedBlackTree(Iter begin, Iter end) : RedBlackTree() {
 }
 
 template <typename T> 
-void RedBlackTree<T>::insert(const T &value, Node *node) {
-    Node *current = node == nullptr ? this->root : node;
-    if (current == nullptr) {
+void RedBlackTree<T>::insert(const T &value) {
+    if (this->root == nullptr) {
         this->root = new Node(value, nullptr, nullptr, nullptr, Node::Color::BLACK);
         return;
     }
 
+    Node *current = this->root;
     Node *inserted = nullptr;
 
     while (inserted == nullptr) {
-        if (value < current->value) {
-            if (current->left != nullptr) {
+        if (value < getValue(current)) {
+            if (getLeft(current) != nullptr) {
                 current = current->left;
             } else {
-                inserted = current->left = new Node(value, current, nullptr, nullptr);
+                setLeft(current, new Node(value, current, nullptr, nullptr));
+                inserted = getLeft(current);
             }
-        } else if (value > current->value) {
-            if (current->right != nullptr) {
-                current = current->right;
+        } else if (value > getValue(current)) {
+            if (getRight(current) != nullptr) {
+                current = getRight(current);
             } else {
-                inserted = current->right = new Node(value, current, nullptr, nullptr);
+                setRight(current, new Node(value, current, nullptr, nullptr));
+                inserted = getRight(current);
             }
         } else {
             std::cout << "Already have an equal node: " << value << "\n";
@@ -116,11 +118,11 @@ void RedBlackTree<T>::remove(const T &value, Node *node) {
             if (getLeft(z) == nullptr) {
                 x = getRight(z);
                 xParent = getParent(z);
-                transplant(z, getRight(z));
+                this->transplant(z, getRight(z));
             } else if (getRight(z) == nullptr) {
                 x = getLeft(z);
                 xParent = getParent(z);
-                transplant(z, getLeft(z));
+                this->transplant(z, getLeft(z));
             } else {
                 y = this->maximumNode(getLeft(z));
                 yOriginalColor = getColor(y);
@@ -133,14 +135,14 @@ void RedBlackTree<T>::remove(const T &value, Node *node) {
                     }
                 } else {
                     xParent = getParent(y);
-                    transplant(y, getLeft(y));
+                    this->transplant(y, getLeft(y));
                     setLeft(y, getLeft(z));
                     if (getLeft(y) != nullptr) {
                         setParent(getLeft(y), y);
                     }
                 }
 
-                transplant(z, y);
+                this->transplant(z, y);
                 setRight(y, getRight(z));
                 if (getRight(y) != nullptr) {
                     setParent(getRight(y), y);
@@ -156,20 +158,6 @@ void RedBlackTree<T>::remove(const T &value, Node *node) {
             }
             break;
         }
-    }
-}
-
-template <typename T> //val null
-void RedBlackTree<T>::transplant(Node *u, Node *v) {
-    if (getParent(u) == nullptr) {
-        this->root = v;
-    } else if (u == getLeft(getParent(u))) {
-        setLeft(getParent(u), v);
-    } else {
-        setRight(getParent(u), v);
-    }
-    if (v != nullptr) {
-        setParent(v, getParent(u));
     }
 }
 
@@ -289,7 +277,7 @@ void RedBlackTree<T>::setColor(Node *node, Node::Color color) {
 }
 
 template <typename T>
-T RedBlackTree<T>::getValue(Node *node) {
+const T RedBlackTree<T>::getValue(Node *node) {
     return node ? node->value : T{};
 }
 

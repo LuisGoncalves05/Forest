@@ -22,7 +22,7 @@ class AvlTree : public BinarySearchTree<AvlTreeNode<T>> {
         template <std::input_iterator Iter> requires std::same_as<std::iter_value_t<Iter>, T>
         AvlTree(Iter begin, Iter end);
         
-        void insert(const T &value, Node *node = nullptr) override;
+        void insert(const T &value) override;
         void remove(const T &value, Node *node = nullptr) override;
 };
 

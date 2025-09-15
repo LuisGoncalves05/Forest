@@ -8,13 +8,13 @@ AvlTree<T>::AvlTree(Iter begin, Iter end) {
 }
 
 template <typename T>
-void AvlTree<T>::insert(const T &value, Node *node) {
+void AvlTree<T>::insert(const T &value) {
     if (this->root == nullptr) {
         this->root = new Node(value);
         return;
     }
 
-    Node *current = node == nullptr ? this->root : node;
+    Node *current = this->root;
     while (true) {
         if (value < current->value) {
             if (current->left) {
@@ -31,10 +31,11 @@ void AvlTree<T>::insert(const T &value, Node *node) {
                 break;
             }
         } else {
-            std::cout << "Already have an equal node: " << node->value << "\n";
+            std::cout << "Already have an equal node: " << value << "\n";
             return;
         }
     }
+
     updateHeights(current);
     balance(current);
 }
@@ -83,22 +84,18 @@ void AvlTree<T>::remove(const T &value, Node *node) {
                     child->parent = previous;
                 }
             } else { // 2 children
-                const T &m = this->minimum(current->right);
-                remove(m, current);
+                Node* m = this->maximumNode(current->left);
 
-                Node *min = new Node(m, previous);
-                min->left = current->left;
-                min->right = current->right;
-                current->left->parent = min;
-                current->right->parent = min;
-
-                if (current == this->root) {
-                    this->root = min;
-                } else if (current == previous->left) {
-                    previous->left = min;
-                } else if (current == previous->right) {
-                    previous->right = min;
+                if (m->parent != current) {
+                    this->transplant(m, m->left);
+                    m->left = current->left;
+                    if (m->left) m->left->parent = m;
                 }
+
+                this->transplant(current, m);
+
+                m->right = current->right;
+                if (m->right) m->right->parent = m;
             }
             delete current;
             updateHeights(previous);
