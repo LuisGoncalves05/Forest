@@ -3,16 +3,19 @@
 #include "../trees.hpp"
 
 
-TEST(AVLRandomInsertTest, BasicAssertions) {
+TEST(BSTRandomInsertTest, BasicAssertions) {
     srand(time(NULL));
-    const int N = 1 << 10;
+    const int N = 1 << 21;
 
+    std::vector<int> vec;
     std::set<int> stlSet;
     for (int i = 0; i < N; i++) {
-        stlSet.insert(rand() % (N << 3));
+        int el = rand() % (N << 3);
+        auto [_, inserted] = stlSet.insert(el);
+        if (inserted) vec.push_back(el);
     }
 
-    auto mySet = BST<int>(stlSet.begin(), stlSet.end());
+    auto mySet = BST<int>(vec.begin(), vec.end());
 
     for (size_t i = 0; i < stlSet.size(); i++) {
         int elements[2] = {*stlSet.begin(), *stlSet.rbegin()};

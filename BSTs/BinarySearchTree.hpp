@@ -40,7 +40,7 @@ class BinarySearchTree {
         
         const valueType &minimum();
         const valueType &maximum();
-        bool find(const valueType &value);
+        virtual bool find(const valueType &value);
         
         int maxHeight();
         
