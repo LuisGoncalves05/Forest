@@ -4,7 +4,7 @@
 #include <cmath>
 #include "trees.hpp"
 
-int main() {
+int main() {/*
     const int N = 1 << 21;
     std::set<int> v;
     srand(time(NULL));
@@ -25,6 +25,28 @@ int main() {
         int el = *--v.end();
         a.remove(el);
         v.erase(el);
+    }*/
+
+    srand(0);
+    const int N = 1 << 3;
+    std::set<int> v;
+    auto a = SPL<int>(v.begin(), v.end());
+    for (int i = 0; i < N; i++) {
+        int el = rand() % (N << 3);
+        a.insert(el);
+        v.insert(el);
+        std::cout << el << std::endl;
+        std::cout << a << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    while(v.size()) {
+        int el = *--v.end();
+        a.remove(el);
+        v.erase(el);
+        std::cout << el << std::endl;
+        std::cout << a << std::endl;
     }
 
     return 0;

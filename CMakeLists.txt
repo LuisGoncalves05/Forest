@@ -4,6 +4,7 @@ project(playground)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -fsanitize=address")
 
 add_executable(playground playground.cpp)
 
@@ -33,3 +34,8 @@ gtest_discover_tests(avlTests)
 add_executable(rbtTests tests/rbtTests.cpp)
 target_link_libraries(rbtTests GTest::gtest_main)
 gtest_discover_tests(rbtTests)
+
+# --- Red-Black Tree tests ---
+add_executable(splTests tests/splTests.cpp)
+target_link_libraries(splTests GTest::gtest_main)
+gtest_discover_tests(splTests)

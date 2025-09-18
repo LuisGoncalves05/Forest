@@ -14,3 +14,8 @@ using AVL = AvlTree<T>;
 
 template <typename T>
 using RBT = RedBlackTree<T>;
+
+#include "BSTs/Splay/SplayTree.hpp"
+
+template <typename T>
+using SPL = SplayTree<T>;
